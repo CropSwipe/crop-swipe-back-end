@@ -44,7 +44,6 @@ THIRD_PARTY_APPS = [
 
 CUSTOM_APPS = [
     'crop',
-    'post',
     'user',
 ]
 
@@ -110,6 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'user.User' # [app].[model]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
