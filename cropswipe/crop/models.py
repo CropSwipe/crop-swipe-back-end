@@ -16,6 +16,7 @@ class Project(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=False)
     comments = GenericRelation('Comment', related_query_name='project')
 
     def __str__(self):

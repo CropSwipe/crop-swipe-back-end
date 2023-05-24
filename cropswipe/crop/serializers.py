@@ -9,7 +9,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
         extra_kwargs = {
-            'author': {'read_only': True}
+            'is_active': {'read_only': True}
         }
 # Comment Serializer
 class CommentSerializer(serializers.ModelSerializer):

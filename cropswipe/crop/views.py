@@ -13,15 +13,16 @@ from .serializers import ProjectSerializer, CommentSerializer
 class ProjectListView(APIView):
     # GET
     def get(self, request):
-        projects = Project.objects.all()
+        projects = Project.objects.filter(is_active=True)
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     # POST
     def post(self, request):
         data = request.data
         serializer = ProjectSerializer(data=data)
+        request.user = User.objects(pk=1)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -33,6 +34,9 @@ class ProjectDetailView(APIView):
     # GET
     def get(self, request, pk):
         project = self.get_project(pk)
+        # is_acitve == False Project rejection
+        if(project.is_active == False):
+            return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
     # PATCH
