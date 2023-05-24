@@ -1,8 +1,9 @@
 # Restframework
 from rest_framework import serializers
 # in app
-from .models import Project
+from .models import Project, Comment
 
+# Project Serializer
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
@@ -10,3 +11,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'author': {'read_only': True}
         }
+# Comment Serializer
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'content', 'author', 'created_at',]

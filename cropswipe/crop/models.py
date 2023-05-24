@@ -1,7 +1,7 @@
 # django package
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 # in app package
 from user.models import User
 
@@ -15,7 +15,8 @@ class Project(models.Model):
     goal_amount = models.PositiveIntegerField()
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)   
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    comments = GenericRelation('Comment', related_query_name='project')
 
     def __str__(self):
         return self.title[:20]

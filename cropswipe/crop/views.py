@@ -5,8 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 # in app
-from .models import Project
-from .serializers import ProjectSerializer
+from .models import Project, Comment
+from user.models import User
+from .serializers import ProjectSerializer, CommentSerializer
 
 # Create your views here.
 class ProjectListView(APIView):
@@ -48,3 +49,51 @@ class ProjectDetailView(APIView):
         project = self.get_project(pk)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CommentListView(APIView):
+    # GET
+    def get(self, request, pk):
+        try:
+            comments = Comment.objects.filter(project__id = pk)
+            serializer = CommentSerializer(comments, many=True)
+            response_data = {
+                'comments_count': len(comments), # add comment count data
+                'comments': serializer.data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    # POST
+    def post(self, request, pk):
+        try:
+            data = request.data
+            serializer = CommentSerializer(data=data, partial=True)
+            project = Project.objects.get(pk=pk)
+            if serializer.is_valid():
+                serializer.save(author=request.user, comment_obj = project)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Project.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class CommentDetailView(APIView):
+    # PATCH
+    def patch(self, request, ppk, cpk):
+        try:
+            data = request.data
+            comment = Comment.objects.get(pk=cpk)
+            serializer = CommentSerializer(data=data, instance=comment, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    # DELETE
+    def delete(self, request, ppk, cpk):
+        try:
+            comment = Comment.objects.get(pk=cpk)
+            comment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
