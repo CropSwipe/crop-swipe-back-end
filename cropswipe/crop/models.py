@@ -8,6 +8,9 @@ from user.models import User
 # Create your models here.
 class Project(models.Model):
     title = models.CharField(max_length=100)
+    project_pic1 = models.ImageField(upload_to="")
+    project_pic2 = models.ImageField(upload_to="", blank=True, null=True)
+    project_pic3 = models.ImageField(upload_to="", blank=True, null=True)
     description = models.TextField()
     goal_amount = models.PositiveIntegerField()
     start_date = models.DateTimeField(auto_now_add=True)
