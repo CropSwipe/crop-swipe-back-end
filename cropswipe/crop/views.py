@@ -1,5 +1,6 @@
 # django
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import ensure_csrf_cookie
 # Restfraemwork
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,11 +13,13 @@ from .serializers import ProjectSerializer, CommentSerializer
 # Create your views here.
 class ProjectListView(APIView):
     # GET
+    @ensure_csrf_cookie
     def get(self, request):
         projects = Project.objects.filter(is_active=True)
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     # POST
+    @ensure_csrf_cookie
     def post(self, request):
         data = request.data
         serializer = ProjectSerializer(data=data)
