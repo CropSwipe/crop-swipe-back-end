@@ -1,7 +1,7 @@
 # load django package
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager # Abstractuser load
-
+# Abstractuser, BaseUserManager, PermissionsMixin load
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 # Create your models here.
 class UserManager(BaseUserManager):
     # common user creation
@@ -28,11 +28,12 @@ class UserManager(BaseUserManager):
             phone = phone,
             password = password,
         )
-        user.is_admin = True
+        #user.is_superuser = True
+        user.is_staff = True
         user.save(using=self._db)
         return user
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
     # Custom Field
     id = models.AutoField(primary_key=True)
@@ -42,19 +43,10 @@ class User(AbstractBaseUser):
     following = models.ManyToManyField('self', symmetrical=False, blank=True)
     # Necessary Field
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    #is_superuser = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     # User 모델 식별을 위한 필드 설정
     USERNAME_FIELD = 'email'
     # 필수로 작성해야 되는 필드
     REQUIRED_FIELDS = ['nickname', 'phone']
-
-    def has_perm(self, perm, obj=None):
-       return self.is_admin
-
-    def has_module_perms(self, app_label):
-       return self.is_admin
-
-    @property
-    def is_staff(self):
-        return self.is_admin

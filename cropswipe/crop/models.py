@@ -7,12 +7,24 @@ from user.models import User
 
 # Create your models here.
 class Project(models.Model):
+    CATEGORY_CHOICES = (
+        ('채소류', '채소류'),
+        ('과일류', '과일류'),
+        ('샐러드', '샐러드'),
+        ('버섯류', '버섯류'),
+    )
+
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=4)
     title = models.CharField(max_length=100)
     project_pic1 = models.ImageField(upload_to="")
     project_pic2 = models.ImageField(upload_to="", blank=True, null=True)
     project_pic3 = models.ImageField(upload_to="", blank=True, null=True)
     description = models.TextField()
-    goal_amount = models.PositiveIntegerField()
+    goal_amount = models.PositiveIntegerField(verbose_name='목표금액')
+    cur_amount = models.PositiveIntegerField(verbose_name='모인금액', default=0)
+    cnt_supporter = models.PositiveIntegerField(verbose_name='후원자 수', default=0)
+    private_price = models.PositiveIntegerField(verbose_name='개인구매 가격')
+    public_price = models.PositiveIntegerField(verbose_name='공동구매 가격')
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -26,6 +38,12 @@ class Funding(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
     supporter = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Purchase(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):

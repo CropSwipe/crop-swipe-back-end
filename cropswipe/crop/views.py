@@ -1,25 +1,22 @@
 # django
 from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import ensure_csrf_cookie
 # Restfraemwork
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 # in app
-from .models import Project, Comment
+from .models import Project, Comment, Funding, Purchase
 from user.models import User
-from .serializers import ProjectSerializer, CommentSerializer
+from .serializers import ProjectSerializer, CommentSerializer, FundingSerializer, PurchaseSerializer
 
 # Create your views here.
 class ProjectListView(APIView):
     # GET
-    @ensure_csrf_cookie
     def get(self, request):
         projects = Project.objects.filter(is_active=True)
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     # POST
-    @ensure_csrf_cookie
     def post(self, request):
         data = request.data
         serializer = ProjectSerializer(data=data)
@@ -103,4 +100,47 @@ class CommentDetailView(APIView):
             comment.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class FundingListView(APIView):
+    # GET
+    def get(self, request, pk):
+        fundings = Funding.objects.filter(project__pk = pk)
+        serializer = FundingSerializer(fundings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # POST
+    def post(self, request, pk):
+        try:
+            data = request.data
+            serializer = FundingSerializer(data=data, partial=True)
+            project = Project.objects.get(pk=pk)
+            if serializer.is_valid():
+                serializer.save(supporter=request.user, project = project)
+                # 프로젝트 정보 수정(* 모인금액, 후원자 수)
+                price = project.public_price * data['amount']
+                project.cur_amount += price
+                project.cnt_supporter += 1
+                project.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Project.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
+class PurchaseListView(APIView):
+    # GET
+    def get(self, request, pk):
+        purchases = Purchase.objects.filter(project__pk = pk)
+        serializer = PurchaseSerializer(purchases, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # POST
+    def post(self, request, pk):
+        try:
+            data = request.data
+            serializer = PurchaseSerializer(data=data, partial=True)
+            project = Project.objects.get(pk=pk)
+            if serializer.is_valid():
+                serializer.save(customer=request.user, project = project)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
