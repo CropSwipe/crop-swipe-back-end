@@ -40,6 +40,16 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+    # rest_auth 관련
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    # django allauth 관련
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    # 그 외
     'corsheaders',
 ]
 
@@ -141,3 +151,40 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ACCOUNT_EMAIL_REQUIRED = True # 이메일 필드 필수 여부
+ACCOUNT_UNIQUE_EMAIL = True # 이메일 고유성 여부(* 중복 불가)
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드 사용 X
+ACCOUNT_USERNAME_REQUIRED = False # username 필드 필수 여부
+ACCOUNT_AUTHENTICATION_METHOD = 'email' # 인증 방법 : 이메일
+ACCOUNT_EMAIL_VERIFICATION = 'none' # 이메일 인증없이 로그인 불가능
+#ACCOUNT_CONFIRM_EMAIL_ON_GET = True # 이메일 인증을 키를 제출하는 POST 요청이 아닌 단순 링크 클릭으로 처리할 수 있다. True로 설정하면!
+#ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/?verification=1' # 로그인 하지 않은 상태에서 이메일 인증시 리다렉션 URL
+#ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=2' # 로그인 상태에서 이메일 인증 시 리다렉션 URL
+
+SITE_ID = 1
+# 이메일 인증 콘솔로 진행
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSON_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    ),
+}
+
+REST_AUTH = {
+   'USE_JWT' : True,
+   'JWT_AUTH_COOKIE': 'access-token',
+   'JWT_AUTH_REFRESH_COOKIE': 'refresh-token',
+   'JWT_AUTH_HTTPONLY': False,
+   'USER_DETAILS_SERIALIZER': 'user.serializers.UserSerializer',
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+   'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+   'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
