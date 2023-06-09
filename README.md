@@ -1,5 +1,5 @@
 # Team Logo
-![image](https://github.com/CropSwipe/crop-swipe-back-end/assets/67581495/d37a4787-37c3-4811-9c07-c03bb6be7e27)
+![image](https://github.com/CropSwipe/crop-swipe-back-end/assets/67581495/e8b59aed-b98c-40fd-9f38-3e258e60f685)
 
 # 1. Setup
 
