@@ -20,7 +20,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4m)a#0)x@!uv(^em4=qt*iv*1kek+0*d8o+lz@%30!&&c=vn@q'
+import os, json
+from django.core.exceptions import ImproperlyConfigured
+secret_file = os.path.join(BASE_DIR, 'secrets.json')
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+def get_secret(key, secrets=secrets):
+    try:
+        return secrets[key]
+    except KeyError:
+        error_msg = f"Set the {key} envrionment variable"
+        raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_secret("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,6 +61,8 @@ THIRD_PARTY_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
     # 그 외
     'corsheaders',
 ]
@@ -171,7 +185,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
@@ -187,4 +202,6 @@ from datetime import timedelta
 SIMPLE_JWT = {
    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+   'ALGORITHM': 'HS256',
+   'SIGNING_KEY': SECRET_KEY,
 }
