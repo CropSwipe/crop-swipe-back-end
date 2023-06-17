@@ -24,6 +24,7 @@ def kakao_callback(request):
     redirect_uri = get_secret("SOCIAL_AUTH_KAKAO_REDIRECT_URI")
     # Query string 으로부터 code 가져오기
     code = request.GET.get("code")
+    print(code)
 
     # request access token
     url = "https://kauth.kakao.com/oauth/token"
@@ -37,11 +38,11 @@ def kakao_callback(request):
     # Response python 객체 반환
     token_request = requests.post(url, data=datas, headers=headers)
     token_response_json = token_request.json()
-
+    
     # 에러 여부 체크
     error = token_response_json.get("error", None)
     if error is not None:
-        raise json.JSONDecodeError(error)
+        return JsonResponse({'err_msg': 'authorization code is not available'}, status=status.HTTP_400_BAD_REQUEST)
     
     # access token 가져오기
     access_token = token_response_json.get("access_token")
@@ -82,5 +83,5 @@ def kakao_callback(request):
     
 class KakaoLogin(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
-    callback_url =  'http://127.0.0.1/api/v1/user/login/kakao/callback/'
+    callback_url =  'http://127.0.0.1:8000/api/v1/user/login/kakao/callback/'
     client_class = OAuth2Client

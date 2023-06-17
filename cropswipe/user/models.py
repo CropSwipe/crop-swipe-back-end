@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
             phone = phone,
             password = password,
         )
-        #user.is_superuser = True
+        user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
         return user
@@ -43,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     following = models.ManyToManyField('self', symmetrical=False, blank=True)
     # Necessary Field
     is_active = models.BooleanField(default=True)
-    #is_superuser = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
     # User 모델 식별을 위한 필드 설정
