@@ -60,7 +60,8 @@ def kakao_callback(request):
     try:
         user = User.objects.get(email=email)
         social_user = SocialAccount.objects.get(user=user)
-        if social_user.provider != 'Kakao':
+        print(social_user.provider)
+        if social_user.provider != 'kakao':
             return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
         data = {'code':code, 'access_token':access_token}
         authentication = requests.post("http://127.0.0.1:8000/api/v1/user/login/kakao/auth/", data=data)
