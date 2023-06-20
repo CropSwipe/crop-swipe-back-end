@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/v1/user/registration/', include('dj_rest_auth.registration.urls')),
     path('api/v1/user/', include('allauth.urls')),
     path('api/v1/user/', include('user.urls')),
+    path('api/v1/post/', include('post.urls')),
     #url(r'^accounts-rest/registration/account-confirm-email/(?P<key>.+)/$', confirm_email, name='account_confirm_email'),
 ]

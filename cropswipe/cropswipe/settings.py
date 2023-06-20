@@ -70,6 +70,7 @@ THIRD_PARTY_APPS = [
 CUSTOM_APPS = [
     'crop',
     'user',
+    'post',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
@@ -185,8 +186,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
