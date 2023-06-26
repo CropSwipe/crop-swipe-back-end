@@ -126,6 +126,7 @@ class CommentDetailView(APIView):
     # get object func
     def get_object(self, pk):
         comment = get_object_or_404(Comment, pk=pk)
+        self.check_object_permissions(self.request, comment)
         return comment
     # patch
     def patch(self, request, ppk, cpk):
