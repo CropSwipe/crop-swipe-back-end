@@ -29,7 +29,6 @@ class Project(models.Model):
     end_date = models.DateTimeField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=False)
-    comments = GenericRelation('Comment', related_query_name='project')
 
     def __str__(self):
         return self.title[:20]
@@ -50,17 +49,16 @@ class Comment(models.Model):
     content = models.TextField(max_length=500, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='+')
-    object_id = models.PositiveIntegerField()
-    comment_obj = GenericForeignKey('content_type', 'object_id')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='crop_comments')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     # product 추후에 도입 필요
     def __str__(self):
         return self.content[:20]
     
 class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='crop_app_likes')
     created_at = models.DateTimeField(auto_now_add=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='+')
     object_id = models.PositiveIntegerField()
     like_obj = GenericForeignKey('content_type', 'object_id')
 

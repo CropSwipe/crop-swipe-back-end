@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 # in app
 from .models import Project, Comment, Funding, Purchase
 from user.models import User
@@ -58,14 +59,15 @@ class CommentListView(APIView):
     # GET
     def get(self, request, pk):
         try:
-            comments = Comment.objects.filter(project__id = pk)
+            project = Project.objects.get(pk=pk)
+            comments = Comment.objects.filter(project = pk)
             serializer = CommentSerializer(comments, many=True)
             response_data = {
                 'comments_count': len(comments), # add comment count data
                 'comments': serializer.data
             }
             return Response(response_data, status=status.HTTP_200_OK)
-        except Comment.DoesNotExist:
+        except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     # POST
     def post(self, request, pk):
@@ -74,7 +76,7 @@ class CommentListView(APIView):
             serializer = CommentSerializer(data=data, partial=True)
             project = Project.objects.get(pk=pk)
             if serializer.is_valid():
-                serializer.save(author=request.user, comment_obj = project)
+                serializer.save(author=request.user, project = project)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Project.DoesNotExist:
