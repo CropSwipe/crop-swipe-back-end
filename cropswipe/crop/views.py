@@ -6,12 +6,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 # in app
-from .models import Project, Comment, Funding, Purchase
+from .models import Project, Comment, Funding
 from user.models import User
-from .serializers import ProjectSerializer, CommentSerializer, FundingSerializer, PurchaseSerializer
+from .serializers import ProjectSerializer, CommentSerializer, FundingSerializer
 
 # Create your views here.
 class ProjectListView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     # GET
     def get(self, request):
         projects = Project.objects.filter(is_active=True)
@@ -19,13 +20,17 @@ class ProjectListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     # POST
     def post(self, request):
-        data = request.data
-        serializer = ProjectSerializer(data=data)
-        request.user = User.objects(pk=1)
-        if serializer.is_valid():
-            serializer.save(author=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        project = request.data["project"]
+        private_price = request.data["private_price"]
+        public_price = request.data["public_price"]
+        
+        user = request.user
+        #project_serializer = ProjectSerializer(data=project)
+        #private_serializer = 
+        #if serializer.is_valid():
+        #    serializer.save(author=user)
+        #    return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProjectDetailView(APIView):
     # Get Project object func
@@ -124,25 +129,6 @@ class FundingListView(APIView):
                 project.cur_amount += price
                 project.cnt_supporter += 1
                 project.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-        except Project.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    
-class PurchaseListView(APIView):
-    # GET
-    def get(self, request, pk):
-        purchases = Purchase.objects.filter(project__pk = pk)
-        serializer = PurchaseSerializer(purchases, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    # POST
-    def post(self, request, pk):
-        try:
-            data = request.data
-            serializer = PurchaseSerializer(data=data, partial=True)
-            project = Project.objects.get(pk=pk)
-            if serializer.is_valid():
-                serializer.save(customer=request.user, project = project)
                 return Response(serializer.data, status=status.HTTP_200_OK)
         except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

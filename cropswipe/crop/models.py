@@ -10,11 +10,13 @@ class Project(models.Model):
     CATEGORY_CHOICES = (
         ('채소류', '채소류'),
         ('과일류', '과일류'),
-        ('샐러드', '샐러드'),
         ('버섯류', '버섯류'),
+        ('축산물', '축산물'),
+        ('쌀/잡곡/견과류', '쌀/잡곡/견과류'),
+        ('수산물/건해산물', '수산물/건해산물')
     )
 
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=4)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=10)
     title = models.CharField(max_length=100)
     project_pic1 = models.ImageField(upload_to="")
     project_pic2 = models.ImageField(upload_to="", blank=True, null=True)
@@ -23,8 +25,6 @@ class Project(models.Model):
     goal_amount = models.PositiveIntegerField(verbose_name='목표금액')
     cur_amount = models.PositiveIntegerField(verbose_name='모인금액', default=0)
     cnt_supporter = models.PositiveIntegerField(verbose_name='후원자 수', default=0)
-    private_price = models.PositiveIntegerField(verbose_name='개인구매 가격')
-    public_price = models.PositiveIntegerField(verbose_name='공동구매 가격')
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -39,10 +39,16 @@ class Funding(models.Model):
     supporter = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Purchase(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+class PrivatePrice(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='private_prices')
+    price = models.PositiveIntegerField()
+    content = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+class PublicPrice(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='public_prices')
+    price = models.PositiveIntegerField()
+    content = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):

@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 # in restframework
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 # in post app
 from .models import Post, Comment, Like
@@ -132,7 +132,7 @@ class CommentDetailView(APIView):
     def patch(self, request, ppk, cpk):
         data = request.data
         comment = self.get_object(cpk)
-        serializer = CommentSerializer(data=data, instance=comment)
+        serializer = CommentSerializer(data=data, instance=comment, context={'user': request.user})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
