@@ -41,8 +41,6 @@ class CommentSerializer(serializers.ModelSerializer):
             if is_like: return True
             else: return False
         return None
-
-
     # validate function
     def validate_content(self, value):
         for word in bad_words:

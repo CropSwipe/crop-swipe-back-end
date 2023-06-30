@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .models import Post, Comment, Like
 from user.models import User
 from .serializers import PostSerializer, CommentSerializer
-from .permissions import IsOwnerPermission
+from .permissions import IsPostOwnerPermission
 
 class PostListView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -26,7 +26,7 @@ class PostListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PostDetailView(APIView):
-    permission_classes = [IsOwnerPermission]
+    permission_classes = [IsPostOwnerPermission]
     # get post object
     def get_object(self, pk):
         post = get_object_or_404(Post, pk=pk)
@@ -94,35 +94,37 @@ class PostLikeProcessView(APIView):
 
 class CommentListView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    # get object function
+    def get_object(self, pk):
+        post = get_object_or_404(Post, pk=pk)
+        return post
     # GET
     def get(self, request, pk):
-        try:
-            post = Post.objects.get(pk=pk)
-            comments = Comment.objects.filter(post = post)
-            serializer = CommentSerializer(comments, many=True, context={'user': request.user})
-            response_data = {
-                'comments_count': len(comments), # add comment count data
-                'comments': serializer.data
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        except Post.DoesNotExist:
-            return Response({"error_message": f"Post-{pk} doesn't exist."},status=status.HTTP_404_NOT_FOUND)
+        post = self.get_object(pk)
+        user = request.user
+        comments = Comment.objects.filter(post = post)
+        serializer = CommentSerializer(comments, many=True, context={'user': user})
+        response_data = {
+            'comments_count': len(comments), # add comment count data
+            'comments': serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     # POST
     def post(self, request, pk):
         try:
             user = request.user
             data = request.data
-            serializer = CommentSerializer(data=data, context={'user': request.user})
             post = Post.objects.get(pk=pk)
+            serializer = CommentSerializer(data=data, context={'user': user})
             if serializer.is_valid():
-                serializer.save(author=request.user, post=post)
+                serializer.save(author=user, post=post)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Post.DoesNotExist:
             return Response({"error_message": f"Post-{pk} doesn't exist."},status=status.HTTP_404_NOT_FOUND)
 
 class CommentDetailView(APIView):
-    permission_classes = [IsOwnerPermission]
+    permission_classes = [IsPostOwnerPermission]
     # get object func
     def get_object(self, pk):
         comment = get_object_or_404(Comment, pk=pk)
@@ -144,33 +146,27 @@ class CommentDetailView(APIView):
         return Response({"message":"Success Comment Delete"}, status=status.HTTP_204_NO_CONTENT)
 
 class CommentLikeProcessView(APIView):
+    # get object function
+    def get_object(self, cpk):
+        comment = get_object_or_404(Comment, pk=cpk)
+        return comment
+    # POST
     def post(self, request, ppk, cpk):
         try:
-            post = Post.objects.get(pk=ppk)
-            comment = Comment.objects.get(pk=cpk)
+            comment = self.get_object(cpk)
             user = request.user
             like = Like.objects.filter(user=user, comment=comment)
-            # 이미 좋아요 눌렀을 경우
-            if like: 
-                return Response({"error_message": "Like already exists."}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                Like.objects.create(user=user, like_obj=comment)
-                return Response({"message": f"Success Post({ppk}):Comment({cpk}):User({user}):Like Post"}, status=status.HTTP_201_CREATED)
-        except Post.DoesNotExist:
-            return Response({"error_message": f"Post-{ppk} doesn't exist."},status=status.HTTP_404_NOT_FOUND)
-        except Comment.DoesNotExist:
-            return Response({"error_message": f"Comment-{cpk} doesn't exist."},status=status.HTTP_404_NOT_FOUND)
+            return Response({"error_message": "Like already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        except Like.DoesNotExist:
+            Like.objects.create(user=user, like_obj=comment)
+            return Response({"message": f"Success Post({ppk}):Comment({cpk}):User({user}):Like Post"}, status=status.HTTP_201_CREATED)
+    # DELETE
     def delete(self, request, ppk, cpk):
         try:
-            post = Post.objects.get(pk=ppk)
-            comment = Comment.objects.get(pk=cpk)
+            comment = self.get_object(cpk)
             user = request.user
             like = Like.objects.get(user=user, comment=comment)
             like.delete()
             return Response({"message": f"Success Post({ppk}):Comment({cpk}):User({user}):Like Delete"}, status=status.HTTP_204_NO_CONTENT)
-        except Post.DoesNotExist:
-            return Response({"error_message": f"Post-{ppk} doesn't exist."},status=status.HTTP_404_NOT_FOUND)
-        except Comment.DoesNotExist:
-            return Response({"error_message": f"Comment-{cpk} doesn't exist."},status=status.HTTP_404_NOT_FOUND)
         except Like.DoesNotExist:
             return Response({"error_message": "Like doesn't exist."},status=status.HTTP_404_NOT_FOUND)

@@ -29,6 +29,7 @@ class Project(models.Model):
     end_date = models.DateTimeField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=False)
+    likes = GenericRelation('Like', related_query_name='project')
 
     def __str__(self):
         return self.title[:20]
@@ -57,6 +58,7 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='crop_comments')
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    likes = GenericRelation('Like', related_query_name='comment')
     # product 추후에 도입 필요
     def __str__(self):
         return self.content[:20]
