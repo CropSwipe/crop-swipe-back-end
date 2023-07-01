@@ -97,9 +97,10 @@ class CommentSerializer(serializers.ModelSerializer):
     likes_cnt = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    updated_at = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'author', 'created_at', 'likes_cnt', 'is_like']
+        fields = ['id', 'content', 'author', 'created_at', 'updated_at', 'likes_cnt', 'is_like']
     # method for serializermethodfield
     def get_likes_cnt(self, obj):
         value = len(obj.likes.all())

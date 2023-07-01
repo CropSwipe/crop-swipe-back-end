@@ -59,7 +59,6 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='crop_comments')
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     likes = GenericRelation('Like', related_query_name='comment')
-    # product 추후에 도입 필요
     def __str__(self):
         return self.content[:20]
     
