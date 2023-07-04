@@ -26,5 +26,6 @@ urlpatterns = [
     path('api/v1/user/', include('allauth.urls')),
     path('api/v1/user/', include('user.urls')),
     path('api/v1/post/', include('post.urls')),
+    path('api/v1/payment/', include('payment.urls')),
     #url(r'^accounts-rest/registration/account-confirm-email/(?P<key>.+)/$', confirm_email, name='account_confirm_email'),
 ]

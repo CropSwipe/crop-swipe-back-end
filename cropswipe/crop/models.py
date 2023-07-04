@@ -34,12 +34,6 @@ class Project(models.Model):
     def __str__(self):
         return self.title[:20]
 
-class Funding(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
-    supporter = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
 class PrivatePrice(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='private_prices')
     price = models.PositiveIntegerField()
@@ -68,6 +62,15 @@ class Like(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='+')
     object_id = models.PositiveIntegerField()
     like_obj = GenericForeignKey('content_type', 'object_id')
+
+class Funding(models.Model):
+    amount = models.PositiveIntegerField()
+    supporter = models.ForeignKey(User, on_delete=models.CASCADE)
+    public_price = models.ForeignKey(PublicPrice, on_delete=models.CASCADE)
+    receiver_name = models.CharField(max_length=5)
+    receiver_address = models.CharField(max_length=50)
+    receiver_phone = models.CharField(max_length=15)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class Review(models.Model):
     RATING_CHOICES = (
