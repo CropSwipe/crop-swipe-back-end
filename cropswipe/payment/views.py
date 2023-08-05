@@ -48,7 +48,7 @@ class KakaopayReadyView(APIView):
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 class KakaoApproveView(APIView):
-    def get(self, request):
+    def post(self, request):
         admin_key = get_secret("SOCIAL_PAYMENT_KAKAO_ADMIN_KEY")
         authorization = f"KakaoAK {admin_key}"
         tid = request.GET['tid']
@@ -66,5 +66,13 @@ class KakaoApproveView(APIView):
             "pg_token": pg_token
         }
         res = requests.post(url, headers=headers, data=params)
-        res_json = res.json()
-        return Response(res_json, status=status.HTTP_200_OK)
+        # 결제 승인시
+        if res.status_code == 200:
+            data = request.data # 수령인 이름, 주소, 번호 등의 정보
+            res_json = res.json()
+            return Response(res_json, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                'message': 'Invalid request'
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)

@@ -17,4 +17,6 @@ urlpatterns = [
     path('/myprojects/<int:project_pk>/private/prices/<int:price_pk>', MyProjectPrivatePriceDetailView.as_view()),
     path('/myprojects/<int:pk>/public/prices', MyProjectPublicPriceListView.as_view()),
     path('/myprojects/<int:project_pk>/public/prices/<int:price_pk>', MyProjectPublicPriceDetailView.as_view()),
+    # order api
+    path('/order/private', PrivateOrderView.as_view()),
 ]

@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from .models import Project, Comment, Like, PrivatePrice, PublicPrice
 from .serializers import ProjectListlSerializer, ProjectDetailSerializer, MyProjectlSerializer, CommentSerializer, PrivatePriceSerializer, PublicPriceSerializer
 from .permissions import IsProjectOwnerPermission, IsPriceOwnerPermission, IsCommentOwnerPermission
+from user.serializers import UserSerializer
 
 # Create your views here.
 class ProjectListView(APIView):
@@ -275,3 +276,27 @@ class CommentLikeProcessView(APIView):
             return Response({"message": f"Success Project({ppk}):Comment({cpk}):User({user}):Like Delete"}, status=status.HTTP_204_NO_CONTENT)
         except Like.DoesNotExist:
             return Response({"error_message": "Like doesn't exist."},status=status.HTTP_404_NOT_FOUND)
+
+# order view
+class PrivateOrderView(APIView):
+    # get object
+    def get_object(self, pk):
+        private_price = get_object_or_404(PrivatePrice, pk=pk)
+        return private_price
+    # GET
+    def get(self, request):
+        try:
+            price_id = request.GET['id']
+            quantity = int(request.GET['quantity'])
+            supporter = request.user
+            private_price = self.get_object(price_id)
+            serializer = UserSerializer(supporter)
+            response_data = {
+                'project_title': private_price.project.title,
+                'item_content': private_price.content,
+                'item_price': (private_price.price * quantity),
+                'supporter': serializer.data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error_message': f'{e}'},status=status.HTTP_400_BAD_REQUEST)

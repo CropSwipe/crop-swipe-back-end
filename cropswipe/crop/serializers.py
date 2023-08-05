@@ -1,7 +1,7 @@
 # Restframework
 from rest_framework import serializers
 # in app
-from .models import Project, Comment, Funding, PrivatePrice, PublicPrice
+from .models import Project, Comment, PrivatePrice, PublicPrice
 from user.serializers import UserSerializer
 
 # Project Serializer
@@ -113,11 +113,6 @@ class CommentSerializer(serializers.ModelSerializer):
             if is_like: return True
             else: return False
         return None
-
-class FundingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Funding
-        fields = '__all__'
 
 class PrivatePriceSerializer(serializers.ModelSerializer):
     class Meta:
