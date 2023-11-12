@@ -47,7 +47,7 @@ pipeline{
         stage("==== upload to docker hub ===="){
             steps{
                 script{
-                    sh 'docker push $IMAGE_NAME:$BUILD_NUMBER'
+                    sh 'docker push $IMAGE_NAME:latest'
                 }
             }
             post{
@@ -56,23 +56,6 @@ pipeline{
                 }
                 failure{
                     error "Failure Upload"
-                }
-            }
-        }
-        stage("==== update yaml file ===="){
-            steps{
-                script{
-                    checkout scm
-                    sh"""
-                        ls -al
-                        sed -i 's/\${BUILD_NUMBER}/${env.BUILD_NUMBER}/g' ./api-deploy.yaml
-                        git add .
-                        git status
-                        git commit -m 'update the image tag'
-                        git remote -v
-                        git checkout master
-                        git push origin master
-                    """
                 }
             }
         }
