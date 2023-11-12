@@ -63,7 +63,6 @@ pipeline{
             steps{
                 script{
                     sh"""
-                        cd ../
                         ls -al
                         sed -i 's/\${BUILD_NUMBER}/${env.BUILD_NUMBER}/g' ./api-deploy.yaml
                     """
