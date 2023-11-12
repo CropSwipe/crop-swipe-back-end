@@ -62,14 +62,16 @@ pipeline{
         stage("==== update yaml file ===="){
             steps{
                 script{
-                    sh"""
-                        ls -al
-                        sed -i 's/\${BUILD_NUMBER}/${env.BUILD_NUMBER}/g' ./api-deploy.yaml
-                        git add .
-                        git status
-                        git commit -m "update the image tag"
-                        git push origin HEAD:master
-                    """
+                    withCredentials([string(credentialsId: 'git-key', variable: 'GIT-KEY')]){
+                        sh"""
+                            ls -al
+                            sed -i 's/\${BUILD_NUMBER}/${env.BUILD_NUMBER}/g' ./api-deploy.yaml
+                            git add .
+                            git status
+                            git commit -m "update the image tag"
+                            git push origin HEAD:master
+                        """
+                    }
                 }
             }
         }
