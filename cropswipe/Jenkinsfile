@@ -70,7 +70,8 @@ pipeline{
                         git add .
                         git status
                         git commit -m 'update the image tag'
-                        git push origin master
+                        git remote -v
+                        git push -u origin master
                     """
                 }
             }
