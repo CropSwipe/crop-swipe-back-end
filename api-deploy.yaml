@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: api-container
-        image: seolhuigwan/crop-swipe-api:latest
+        image: seolhuigwan/crop-swipe-api:${BUILD_NUMBER}
         ports:
         - containerPort: 8000
         limits:
