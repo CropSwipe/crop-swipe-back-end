@@ -67,6 +67,7 @@ pipeline{
                         sed -i 's/\${BUILD_NUMBER}/${env.BUILD_NUMBER}/g' ./api-deploy.yaml
                         git config --global user.email "shg5977@naver.com"
                         git config --global user.name "SeolHuiGwan9478"
+                        git pull origin master
                         git add .
                         git status
                         git commit -m 'update the image tag'
