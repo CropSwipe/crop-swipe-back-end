@@ -69,8 +69,8 @@ pipeline{
                         git config --global user.name "SeolHuiGwan9478"
                         git add .
                         git status
-                        git commit -m "update the image tag"
-                        git push origin HEAD:master
+                        git commit -m 'update the image tag'
+                        git push origin master
                     """
                 }
             }
