@@ -62,7 +62,7 @@ pipeline{
         stage("==== update yaml file ===="){
             steps{
                 script{
-                    withCredentials([usernamePassword(credentialsId: 'git-key', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+                    sshagent(credentials: ['git-key']){
                         sh"""
                             ls -al
                             sed -i 's/\${BUILD_NUMBER}/${env.BUILD_NUMBER}/g' ./api-deploy.yaml
