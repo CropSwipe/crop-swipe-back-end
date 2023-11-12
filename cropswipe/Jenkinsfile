@@ -13,9 +13,11 @@ pipeline{
         stage("==== build docker image by dockerfile ===="){
             steps{
                 script{
-                    sh 'cd cropswipe'
-                    sh 'ls -al'
-                    sh 'docker build --tag $IMAGE_NAME:$BUILD_NUMBER .'
+                    sh'''
+                        cd cropswipe/
+                        ls -al
+                        docker build --tag $IMAGE_NAME:$BUILD_NUMBER .
+                    '''
                 }
             }
             post{
