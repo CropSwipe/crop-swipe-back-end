@@ -15,7 +15,7 @@ pipeline{
                 script{
                     sh 'cd cropswipe'
                     sh 'ls -al'
-                    sh 'docker build --tag $IMAGE_NAME:$BUILD_NUMBER'
+                    sh 'docker build --tag $IMAGE_NAME:$BUILD_NUMBER .'
                 }
             }
             post{
