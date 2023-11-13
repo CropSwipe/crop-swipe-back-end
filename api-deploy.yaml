@@ -9,6 +9,11 @@ spec:
     matchLabels:
       app: api
   replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 1
   template:
     metadata:
       labels:
